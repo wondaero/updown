@@ -7,7 +7,7 @@
     <title>없다 운</title>
     <link rel="stylesheet" href="./assets/css/normalize.css" />
     <style>
-      html, body{min-width: 280px; width: 190%;}
+      html, body{min-width: 280px; width: 100%;}
       header{
         width: 100%; position: fixed; top: 0; left: 0; overflow: hidden; z-index: 1;
         box-sizing: border-box; padding: 10px; box-shadow: 0 1px 5px rgba(77, 77, 77, .5);
@@ -52,16 +52,18 @@
 
       .header-4{display: flex; align-items: center; justify-content: center;}
       .header-4 input{margin-right: 5px;}
+      input[type="number"]::-webkit-outer-spin-button, input[type="number"]::-webkit-inner-spin-button {-webkit-appearance: none; margin: 0;}
+      input[type="number"] {-moz-appearance: textfield;}
 
-      .wrong-answer-list{list-style: none; padding: 0; margin: 0; padding-top: 180px;}
-      .wrong-answer-list li{border-bottom: 1px solid rgba(0, 0, 0, .2); padding: 5px;}
+      .wrong-answer-list{list-style: none; padding: 0; margin: 0; padding-top: 180px; width: 100%;}
+      .wrong-answer-list li{border-bottom: 1px solid rgba(0, 0, 0, .2); padding: 5px 10px;}
+      .wrong-answer-list li.init-li{border-bottom: 0; font-size: 22px;}
 
       .num{display: inline-block; width: 10px; background: yellow;}
 
       .arrow{display: inline-block; width: 0; height: 0; border: 5px solid transparent; position: relative; box-sizing: border-box;}
       .arrow-up{border-bottom: 5px solid #f00;  position: relative; top: -2px;}
       .arrow-down{border-top: 5px solid #00f; top: 3px;}
-
     </style>
   </head>
   <body>
@@ -88,7 +90,9 @@
         <button onclick="updown.answer();">제출</button>
       </div>
     </header>
-    <ul id="wrongAnswerList" class="wrong-answer-list"></ul>
+    <ul id="wrongAnswerList" class="wrong-answer-list">
+      <li class="init-li">시작 버튼을 눌러주세요.</li>
+    </ul>
     
     <script>
       const input = document.querySelector('#inputNum input');
@@ -169,6 +173,8 @@
             el.innerText = '?';
           });
 
+          wrongAnswerList.innerHTML = '';
+
           input.focus();
         };
 
@@ -180,6 +186,11 @@
 
           t.inputValue = input.value;
 
+          if(t.inputValue.length !== t.len){
+            alert('숫자를 확인해 주세요.');
+            return;
+          };
+
           input.value = '';
 
           if(t.chkAnswer(t.inputValue)){
@@ -188,6 +199,7 @@
           }else{
             t.wrongAnswer(t.inputValue);
             input.focus();
+            window.scrollTo(0, window.innerHeight + 100); //혹시 모를 100
           };
         }
 
@@ -204,7 +216,7 @@
               el.innerText = '';
             });
 
-            wrongAnswerList.innerHTML = '';
+            wrongAnswerList.innerHTML = '<li class="init-li">시작 버튼을 눌러주세요.</li>';
           }
         }
 
