@@ -106,7 +106,7 @@
 
       function changeDigits(e, num){
         if(updown.start) return;
-        createBlankNum(num === undefined ? e.value : num);
+        createBlankNum(num === undefined ? Number(e.value) : num);
       }
 
       function createBlankNum(len){
@@ -149,7 +149,12 @@
         t.end = false;
 
         t.startGame = function(){
+          if(t.end !== false){
+            alert('초기화 버튼을 눌러주세요.');
+            return;
+          }
           if(t.start !== false) return;
+
 
           t.setRdmNum(t.len);
           t.setStartUI();
@@ -181,6 +186,10 @@
         t.answer = function(){
           if(t.start === false){
             alert('시작버튼을 눌러주세요.');
+            return;
+          }
+          if(t.end !== false){
+            alert('초기화 버튼을 눌러주세요.');
             return;
           }
 
