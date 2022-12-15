@@ -204,7 +204,7 @@
 
           if(t.chkAnswer(t.inputValue)){
             t.end = new Date().getTime();
-            alert((t.end - t.start) + '\n숫자가 낮을 수록 좋음');
+            alert(((t.end - t.start) / 1000) + '초');
           }else{
             t.wrongAnswer(t.inputValue);
             input.focus();
