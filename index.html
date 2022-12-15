@@ -1,0 +1,245 @@
+<!DOCTYPE html>
+<html lang="ko">
+  <head>
+    <meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1, maximum-scale=1, user-scalable=no" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta charset="utf-8" />
+    <title>없다 운</title>
+    <link rel="stylesheet" href="./assets/css/normalize.css" />
+    <style>
+      html, body{min-width: 280px; width: 190%;}
+      header{
+        width: 100%; position: fixed; top: 0; left: 0; overflow: hidden; z-index: 1;
+        box-sizing: border-box; padding: 10px; box-shadow: 0 1px 5px rgba(77, 77, 77, .5);
+      }
+      header:before{
+        content: ''; position: absolute; display: block; top: -10px; left: -10px; right: -10px; bottom: -10px; z-index: -1;
+        -webkit-backdrop-filter: blur(3px); backdrop-filter:blur(3px); background: rgba(255, 255, 255, .1);
+      }
+
+      .header-1{display: flex; align-items: center; justify-content: space-between; margin-bottom: 10px;}
+      .logo{font-size: 20px; margin: 0; padding: 0;}
+
+      .header-2{border-bottom: 1px dashed #ddd; padding-bottom: 10px; margin-bottom: 10px;}
+      .header-2 label{display: inline-flex; align-items: center; justify-content: center;}
+      .header-2 label input{display: none;}
+      .header-2 label input + span{
+        width: 30px; height: 30px; box-sizing: border-box;
+        display: inline-flex; align-items: center; justify-content: center;
+        cursor: pointer;
+      }
+
+      .header-2 label:nth-child(1) input + span{border: 2px solid red;}
+      .header-2 label:nth-child(2) input + span{border: 2px solid orange;}
+      .header-2 label:nth-child(3) input + span{border: 2px solid yellow;}
+      .header-2 label:nth-child(4) input + span{border: 2px solid green;}
+      .header-2 label:nth-child(5) input + span{border: 2px solid blue;}
+      .header-2 label:nth-child(6) input + span{border: 2px solid navy;}
+      .header-2 label:nth-child(7) input + span{border: 2px solid purple;}
+
+      .header-2 label input:checked + span{border: 0; font-weight: 900;}
+      .header-2 label:nth-child(1) input:checked + span{background: red;}
+      .header-2 label:nth-child(2) input:checked + span{background: orange;}
+      .header-2 label:nth-child(3) input:checked + span{background: yellow;}
+      .header-2 label:nth-child(4) input:checked + span{background: green;}
+      .header-2 label:nth-child(5) input:checked + span{background: blue;}
+      .header-2 label:nth-child(6) input:checked + span{background: navy;}
+      .header-2 label:nth-child(7) input:checked + span{background: purple;}
+
+      .header-3{display: flex; align-items: center; justify-content: center; height: 25px; padding-bottom: 10px; border-bottom: 1px solid #ddd; margin-bottom: 10px;}
+      .header-3 span{border: 1px solid #ddd; width: 22px; height: 25px; margin-right: 5px; display: inline-flex; align-items: center; justify-content: center;}
+      .header-3 span:last-child{margin-right: 0;}
+
+      .header-4{display: flex; align-items: center; justify-content: center;}
+      .header-4 input{margin-right: 5px;}
+
+      .wrong-answer-list{list-style: none; padding: 0; margin: 0; padding-top: 180px;}
+      .wrong-answer-list li{border-bottom: 1px solid rgba(0, 0, 0, .2); padding: 5px;}
+
+      .num{display: inline-block; width: 10px; background: yellow;}
+
+      .arrow{display: inline-block; width: 0; height: 0; border: 5px solid transparent; position: relative; box-sizing: border-box;}
+      .arrow-up{border-bottom: 5px solid #f00;  position: relative; top: -2px;}
+      .arrow-down{border-top: 5px solid #00f; top: 3px;}
+
+    </style>
+  </head>
+  <body>
+    <header>
+      <div class="header-1">
+        <h1 class="logo">없다 운</h1>
+        <div>
+          <button onclick="updown.startGame();">시작</button>
+          <button onclick="updown.init()">초기화</button>
+        </div>
+      </div>
+      <div id="digitsBtns" class="header-2">
+        <label><input type="radio" name="digits" onchange="changeDigits(this)" value="4" checked><span>4</span></label>
+        <label><input type="radio" name="digits" onchange="changeDigits(this)" value="5"><span>5</span></label>
+        <label><input type="radio" name="digits" onchange="changeDigits(this)" value="6"><span>6</span></label>
+        <label><input type="radio" name="digits" onchange="changeDigits(this)" value="7"><span>7</span></label>
+        <label><input type="radio" name="digits" onchange="changeDigits(this)" value="8"><span>8</span></label>
+        <label><input type="radio" name="digits" onchange="changeDigits(this)" value="9"><span>9</span></label>
+        <label><input type="radio" name="digits" onchange="changeDigits(this)" value="10"><span>10</span></label>
+      </div>
+      <div id="blankNum" class="header-3"></div>
+      <div id="inputNum" class="header-4">
+        <input type="text" onkeyup="if(window.event.keyCode==13){updown.answer();}"/>
+        <button onclick="updown.answer();">제출</button>
+      </div>
+    </header>
+    <ul id="wrongAnswerList" class="wrong-answer-list"></ul>
+    
+    <script>
+      const input = document.querySelector('#inputNum input');
+      const blankNum = document.querySelector('#blankNum');
+      const digitsBtns = document.querySelector('#digitsBtns');
+      const wrongAnswerList = document.querySelector('#wrongAnswerList');
+
+      const updown = new Updown();
+
+      changeDigits(undefined, 4);
+
+      function changeDigits(e, num){
+        if(updown.start) return;
+        createBlankNum(num === undefined ? e.value : num);
+      }
+
+      function createBlankNum(len){
+        blankNum.innerHTML = '';
+        for(let i = 0; i < len; i++){
+          const span = document.createElement('span');
+          blankNum.appendChild(span);
+        }
+        document.querySelector('#inputNum input').setAttribute('oninput', 'chkLeng(this, ' + len + ')');
+
+        updown.len = len;
+      }
+
+      function chkLeng(e, mx){
+        const val = e.value;
+        if(String(val).length > mx) e.value = val.substr(0, mx);
+        e.value = e.value.replace(/[^0-9]/gi, '');
+      }
+
+      function getRdmNum(mn, mx, exceptArr){
+          let rdmNum = Math.floor(Math.random() * (mx - mn + 1)) + mn;
+          if(exceptArr != undefined){
+              for(let i = 0; i < exceptArr.length; i++){
+                  if(exceptArr[i] == rdmNum) return getRdmNum(mn, mx, exceptArr);
+                  break;
+              }
+          }
+
+          return rdmNum;
+      };
+
+      function Updown(){
+        const t = this;
+
+        t.len = 4;
+        t.rdmNum = '';
+        t.inputValue = '';
+
+        t.start = false;
+        t.end = false;
+
+        t.startGame = function(){
+          if(t.start !== false) return;
+
+          t.setRdmNum(t.len);
+          t.setStartUI();
+
+          t.start = new Date().getTime();
+        }
+
+        t.setRdmNum = function(len){
+          t.rdmNum = '';
+          for(let i = 0; i < len; i++){
+            t.rdmNum += String(getRdmNum(0, 9));
+          }
+        }
+
+        t.setStartUI = function(){
+          digitsBtns.querySelectorAll('input').forEach(function(el){
+            el.setAttribute('disabled', true);
+          });
+
+          blankNum.querySelectorAll('span').forEach(function(el){
+            el.innerText = '?';
+          });
+
+          input.focus();
+        };
+
+        t.answer = function(){
+          if(t.start === false){
+            alert('시작버튼을 눌러주세요.');
+            return;
+          }
+
+          t.inputValue = input.value;
+
+          input.value = '';
+
+          if(t.chkAnswer(t.inputValue)){
+            t.end = new Date().getTime();
+            alert((t.end - t.start) + '\n숫자가 낮을 수록 좋음');
+          }else{
+            t.wrongAnswer(t.inputValue);
+            input.focus();
+          };
+        }
+
+        t.init = function(){
+          if(confirm('초기화 하시겠습니까?')){
+            t.start = t.end = false;
+            t.rdmNum = t.inpuValue = '';
+  
+            digitsBtns.querySelectorAll('input').forEach(function(el){
+              el.removeAttribute('disabled');
+            });
+  
+            blankNum.querySelectorAll('span').forEach(function(el){
+              el.innerText = '';
+            });
+
+            wrongAnswerList.innerHTML = '';
+          }
+        }
+
+        t.chkAnswer = function(val){return val == t.rdmNum;}
+
+        t.wrongAnswer = function(val){
+          let combUpDownTxt = '';
+          let answerNumWithTag = '';
+
+          for(let i = 0; i < t.rdmNum.length; i++){
+            let upDownTxt = '';
+            if(t.rdmNum[i] > val[i]) upDownTxt = '<span class="arrow arrow-up"></span>'; //up
+            else if(t.rdmNum[i] < val[i]) upDownTxt = '<span class="arrow arrow-down"></span>';  //down
+
+            combUpDownTxt += upDownTxt;
+            answerNumWithTag += '<span class="num">' + val[i] + '</span>';
+
+          }
+
+          const li = document.createElement('li');
+          const div1 = document.createElement('div');
+          const div2 = document.createElement('div');
+
+          div1.innerHTML = answerNumWithTag;
+          div2.innerHTML = combUpDownTxt;
+
+          li.appendChild(div1);
+          li.appendChild(div2);
+
+          wrongAnswerList.appendChild(li);
+        }
+
+      }
+
+
+    </script>
+  </body>
+</html>
